@@ -1,47 +1,42 @@
-import React from 'react';
-import { Box, Button, Text, Badge, HStack, VStack } from '@chakra-ui/react';
+// src/components/MasterCard.tsx
+import { Box, Text, Badge, HStack, VStack } from '@chakra-ui/react';
+import { StarIcon } from '@chakra-ui/icons';
+import { useNavigate } from 'react-router-dom';
+import type { Master } from '../services/mockMasters';
 
-type MasterProps = {
-  name: string;
-  profession: string;
-  city: string;
-  rating: number;       // 1-5
-  available: boolean;
-  busyUntil?: string;   // ako nije dostupan
-};
+interface Props extends Master {}
 
-export default function MasterCard({ name, profession, city, rating, available, busyUntil }: MasterProps) {
+const MasterCard = ({ id, name, profession, rating, available }: Props) => {
+  const navigate = useNavigate();
+
   return (
     <Box
-      p={6}
       borderWidth="1px"
-      borderRadius="md"
-      shadow="sm"
-      _hover={{ shadow: 'md', transform: 'translateY(-4px)', transition: 'all 0.2s' }}
+      borderRadius="lg"
+      p={4}
+      cursor="pointer"
+      _hover={{ shadow: 'md', transform: 'scale(1.02)' }}
+      onClick={() => navigate(`/master/${id}`)}
     >
       <VStack align="start" spacing={2}>
-        <Text fontWeight="bold" fontSize="lg">{name}</Text>
-        <Text color="gray.600">{profession} - {city}</Text>
-
-        {/* Status dostupnosti */}
-        <Badge mt={1} colorScheme={available ? 'green' : 'red'}>
-          {available ? 'Dostupan' : `Zauzet do ${busyUntil}`}
-        </Badge>
-
-        {/* Rejting zvezdice iznad dugmeta */}
-        <HStack spacing={1} mt={3}>
-          {Array(5)
-            .fill(0)
-            .map((_, i) => (
-              <Box key={i} color={i < rating ? 'yellow.400' : 'gray.300'} />
-            ))}
+        <Text fontWeight="bold" fontSize="lg">
+          {name}
+        </Text>
+        <Text color="gray.500">{profession}</Text>
+        <HStack>
+          {[...Array(5)].map((_, i) => (
+            <StarIcon
+              key={i}
+              color={i < Math.round(rating) ? 'yellow.400' : 'gray.300'}
+            />
+          ))}
         </HStack>
-
-        {/* Dugme za kontakt */}
-        <Button mt={2} colorScheme="blue" w="full">
-          Kontaktiraj
-        </Button>
+        <Badge colorScheme={available ? 'green' : 'red'}>
+          {available ? 'Dostupan' : 'Nedostupan'}
+        </Badge>
       </VStack>
     </Box>
   );
-}
+};
+
+export default MasterCard;
