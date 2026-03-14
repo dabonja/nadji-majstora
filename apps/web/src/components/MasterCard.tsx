@@ -1,39 +1,82 @@
-// src/components/MasterCard.tsx
-import { Box, Text, Badge, HStack, VStack } from '@chakra-ui/react';
-import { StarIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  Text,
+  Badge,
+  VStack,
+  HStack,
+  Avatar,
+  Flex,
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import type { Master } from '../services/mockMasters';
 
-interface Props extends Master {}
+interface Props {
+  master: Master;
+}
 
-const MasterCard = ({ id, name, profession, rating, available }: Props) => {
+const MasterCard = ({ master }: Props) => {
   const navigate = useNavigate();
 
   return (
     <Box
-      borderWidth="1px"
+      bg="gray.50"
       borderRadius="lg"
-      p={4}
+      p={5}
+      border="1px solid"
+      borderColor="gray.200"
+      boxShadow="sm"
+      transition="all 0.2s"
       cursor="pointer"
-      _hover={{ shadow: 'md', transform: 'scale(1.02)' }}
-      onClick={() => navigate(`/master/${id}`)}
+      _hover={{
+        transform: 'translateY(-3px)',
+        boxShadow: 'lg',
+        bg: 'white',
+      }}
+      onClick={() => navigate(`/master/${master.id}`)}
     >
-      <VStack align="start" spacing={2}>
-        <Text fontWeight="bold" fontSize="lg">
-          {name}
-        </Text>
-        <Text color="gray.500">{profession}</Text>
+      <VStack align="start" spacing={4}>
+
+        {/* TOP SECTION */}
+        <Flex align="center" gap={4} w="100%">
+          <Avatar
+            name={master.name}
+            src={master.image}
+            size="md"
+          />
+
+          <Box>
+            <Text fontWeight="bold" fontSize="lg">
+              {master.name}
+            </Text>
+
+            <Badge colorScheme="purple">
+              {master.profession}
+            </Badge>
+          </Box>
+        </Flex>
+
+        {/* RATING */}
         <HStack>
-          {[...Array(5)].map((_, i) => (
-            <StarIcon
-              key={i}
-              color={i < Math.round(rating) ? 'yellow.400' : 'gray.300'}
-            />
-          ))}
+          <Text fontWeight="bold">
+            ⭐ {master.rating}
+          </Text>
+          <Text fontSize="sm" color="gray.500">
+            ({master.reviews} recenzija)
+          </Text>
         </HStack>
-        <Badge colorScheme={available ? 'green' : 'red'}>
-          {available ? 'Dostupan' : 'Nedostupan'}
+
+        {/* EXPERIENCE */}
+        <Text fontSize="sm" color="gray.600">
+          Iskustvo: {master.experience} godina
+        </Text>
+
+        {/* AVAILABILITY */}
+        <Badge
+          colorScheme={master.available ? 'green' : 'red'}
+        >
+          {master.available ? 'Dostupan' : 'Nedostupan'}
         </Badge>
+
       </VStack>
     </Box>
   );

@@ -1,50 +1,26 @@
-// src/pages/CreateJob.tsx
+import { Box, Button, FormControl, FormLabel, Input, Textarea, Select, useToast } from '@chakra-ui/react';
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Input,
-  Textarea,
-  FormControl,
-  FormLabel,
-  NumberInput,
-  NumberInputField,
-  Select,
-  VStack,
-  Heading,
-  useToast
-} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { mockJobs, type JobOffer } from '../services/mockJobs';
+import type { Account } from '../services/mockAccounts';
 
-const professions = [
-  'vodoinstalater',
-  'električar',
-  'stolar',
-  'molerski radovi',
-  'krojač',
-  'programer',
-  'automehaničar',
-];
+interface Props {
+  currentUser: Account;
+}
 
-export default function CreateJob() {
+const CreateJob = ({ currentUser }: Props) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState(0);
-  const [profession, setProfession] = useState(professions[0]);
-  const [deadline, setDeadline] = useState('');
+  const [budget, setBudget] = useState('');
+  const [profession, setProfession] = useState('');
+  const [contact, setContact] = useState('');
+
   const toast = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = () => {
-    if (!title || !description || !budget || !deadline) {
-      toast({
-        title: 'Greška',
-        description: 'Popunite sva polja',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+    if (!title || !description || !profession) {
+      toast({ title: 'Popunite sve obavezne podatke', status: 'error', duration: 3000 });
       return;
     }
 
@@ -52,66 +28,67 @@ export default function CreateJob() {
       id: mockJobs.length + 1,
       title,
       description,
-      budget,
+      budget: budget.toLowerCase() === 'dogovor' ? 0 : Number(budget),
       profession,
-      deadline,
+      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +7 dana
       createdAt: new Date().toISOString().split('T')[0],
       status: 'active',
       applicants: [],
+      userId: currentUser.id,
+      contact,
     };
 
-    mockJobs.push(newJob);
-
-    toast({
-      title: 'Uspešno kreirano',
-      description: 'Vaša ponuda je dodata.',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-
-    navigate('/jobs'); // može da vodi na listu ponuda
+    mockJobs.push(newJob); // za mock demo
+    toast({ title: 'Ponuda kreirana!', status: 'success', duration: 3000 });
+    navigate('/my-jobs'); // vodi usera na listu ponuda
   };
 
   return (
-    <Box maxW="600px" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="lg">
-      <Heading mb={6}>Kreiraj novu ponudu</Heading>
-      <VStack spacing={4} align="stretch">
-        <FormControl>
-          <FormLabel>Naslov</FormLabel>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-        </FormControl>
+    <Box p={6} maxW="md" mx="auto">
+      <FormControl mb={3} isRequired>
+        <FormLabel>Naslov ponude</FormLabel>
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Opis</FormLabel>
-          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-        </FormControl>
+      <FormControl mb={3} isRequired>
+        <FormLabel>Opis</FormLabel>
+        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Budžet</FormLabel>
-          <NumberInput value={budget} onChange={(valueString) => setBudget(Number(valueString))}>
-            <NumberInputField />
-          </NumberInput>
-        </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Budžet</FormLabel>
+        <Input
+          placeholder="Npr. 5000 ili dogovor"
+          value={budget}
+          onChange={(e) => setBudget(e.target.value)}
+        />
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Tip posla</FormLabel>
-          <Select value={profession} onChange={(e) => setProfession(e.target.value)}>
-            {professions.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </Select>
-        </FormControl>
+      <FormControl mb={3} isRequired>
+  <FormLabel>Kontakt telefon</FormLabel>
+  <Input
+    placeholder="064/123-4567"
+    value={contact}
+    onChange={(e) => setContact(e.target.value)}
+  />
+</FormControl>
 
-        <FormControl>
-          <FormLabel>Rok završetka</FormLabel>
-          <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
-        </FormControl>
+      <FormControl mb={3} isRequired>
+        <FormLabel>Vrsta majstora / profesija</FormLabel>
+        <Select placeholder="Izaberite profesiju" value={profession} onChange={(e) => setProfession(e.target.value)}>
+          <option value="stolar">Stolar</option>
+          <option value="električar">Električar</option>
+          <option value="vodoinstalater">Vodoinstalater</option>
+          <option value="zidar">Zidar</option>
+          <option value="farbar">Farbar</option>
+        </Select>
+      </FormControl>
 
-        <Button colorScheme="blue" onClick={handleSubmit}>
-          Kreiraj ponudu
-        </Button>
-      </VStack>
+      <Button colorScheme="teal" mt={4} onClick={handleSubmit}>
+        Kreiraj ponudu
+      </Button>
     </Box>
   );
-}
+};
+
+export default CreateJob;

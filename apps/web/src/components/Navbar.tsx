@@ -1,60 +1,62 @@
+import { Box, Button, HStack, Text } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import type { Account } from '../services/mockAccounts';
 
-// src/components/Navbar.tsx
-import React from 'react';
-import { Box, Flex, HStack, Link, Input, Text } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
+interface Props {
+  currentUser: Account;
+  setCurrentUser: React.Dispatch<React.SetStateAction<Account | null>>;
+}
 
-export default function Navbar() {
+const Navbar = ({ currentUser, setCurrentUser }: Props) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+
   return (
-    <Box bg="blue.500" px={6} py={3} color="white" boxShadow="md">
-      <Flex alignItems="center" justifyContent="space-between">
-        {/* Logo i tekst */}
-        <HStack spacing={3}>
-          <Box
-            w="40px"
-            h="40px"
-            bg="white"
-            borderRadius="full"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            color="blue.500"
-            fontWeight="bold"
-          >
-            M
-          </Box>
-          <Text fontSize="xl" fontWeight="bold">
-            NadjiMajstora
+    <Box p={4} borderBottom="1px solid #eee">
+      <HStack justify="space-between">
+
+        {/* LEFT SIDE */}
+        <HStack spacing={6}>
+          <Text fontWeight="bold" cursor="pointer" onClick={() => navigate('/')}>
+            Nadji Majstora
           </Text>
+
+          {/* USER NAVIGATION */}
+          {currentUser.role === 'user' && (
+            <>
+              <Text cursor="pointer" onClick={() => navigate('/create-job')}>
+                Nova ponuda
+              </Text>
+
+              <Text cursor="pointer" onClick={() => navigate('/my-jobs')}>
+                Moje ponude
+              </Text>
+            </>
+          )}
+
+          {/* MASTER NAVIGATION */}
+          {currentUser.role === 'master' && (
+            <Text cursor="pointer" onClick={() => navigate('/jobs')}>
+              Ponude
+            </Text>
+          )}
         </HStack>
 
-        {/* Navigacione rute */}
-        <HStack as="nav" spacing={8} display={{ base: 'none', md: 'flex' }}>
-          <Link as={RouterLink} to="/" fontWeight="semibold" _hover={{ textDecoration: 'underline' }}>
-            Home
-          </Link>
-          <Link as={RouterLink} to="/about" fontWeight="semibold" _hover={{ textDecoration: 'underline' }}>
-            O nama
-          </Link>
-          <Link as={RouterLink} to="/offers" fontWeight="semibold" _hover={{ textDecoration: 'underline' }}>
-            Ponude
-          </Link>
-          <Link as={RouterLink} to="/contact" fontWeight="semibold" _hover={{ textDecoration: 'underline' }}>
-            Kontakt
-          </Link>
+        {/* RIGHT SIDE */}
+        <HStack spacing={4}>
+          <Text>{currentUser.username}</Text>
+
+          <Button size="sm" colorScheme="red" onClick={handleLogout}>
+            Logout
+          </Button>
         </HStack>
 
-        {/* Search bar */}
-        <Box display={{ base: 'none', md: 'block' }}>
-          <Input
-            placeholder="Pretraži majstore..."
-            size="sm"
-            bg="white"
-            color="black"
-            _placeholder={{ color: 'gray.500' }}
-          />
-        </Box>
-      </Flex>
+      </HStack>
     </Box>
   );
-}
+};
+
+export default Navbar;

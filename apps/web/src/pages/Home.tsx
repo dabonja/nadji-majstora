@@ -5,13 +5,21 @@ import {
   SimpleGrid,
   Text,
   Select,
+  Button,
+  HStack,
 } from '@chakra-ui/react';
 import MasterCard from '../components/MasterCard';
 import { masters } from '../services/mockMasters';
+import type { Account } from '../services/mockAccounts';
+import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
+interface HomeProps {
+  currentUser: Account;
+} 
+
+export default function Home({currentUser}: HomeProps) {
   const [filter, setFilter] = useState<string>('Svi');
-
+  const navigate = useNavigate();
   // Dohvatimo sve jedinstvene profesije
   const professions = ['Svi', ...Array.from(new Set(masters.map((m) => m.profession)))];
 
@@ -26,7 +34,8 @@ export default function Home() {
         Naši majstori
       </Text>
 
-      {/* Filter po profesiji */}
+     <HStack>
+ {/* Filter po profesiji */}
       <Select
         w="200px"
         mb={6}
@@ -39,11 +48,20 @@ export default function Home() {
           </option>
         ))}
       </Select>
-
+  {currentUser.role === 'user' && (
+        <Button
+          colorScheme="teal"
+          mb={4}
+          onClick={() => navigate('/create-job')}
+        >
+          Kreiraj ponudu
+        </Button>
+      )}
+     </HStack>
       {/* Lista majstora */}
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={6}>
         {filteredMasters.map((m) => (
-          <MasterCard key={m.id} {...m} />
+          <MasterCard master={m} key={m.id} {...m} />
         ))}
       </SimpleGrid>
     </Box>

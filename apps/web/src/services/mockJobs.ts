@@ -9,6 +9,8 @@ export interface JobOffer {
   createdAt: string;
   status: 'active' | 'in_progress' | 'closed';
   applicants: number[]; // ids of masters
+  userId?: number; // ko je kreirao ponudu
+  contact?: string; // broj telefona korisnika
 }
 
 export const mockJobs: JobOffer[] = [
@@ -22,6 +24,8 @@ export const mockJobs: JobOffer[] = [
     createdAt: '2026-03-14',
     status: 'active',
     applicants: [],
+    userId: 1,
+    contact: '064/123-4567',
   },
   {
     id: 2,
@@ -32,6 +36,8 @@ export const mockJobs: JobOffer[] = [
     deadline: '2026-03-22',
     createdAt: '2026-03-14',
     status: 'active',
-    applicants: [],
+    applicants: [1],
+    userId: 1,
+    contact: '064/987-6543',
   },
 ];
