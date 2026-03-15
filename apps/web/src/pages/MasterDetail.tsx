@@ -30,6 +30,7 @@ import { mockComments, type MasterComment } from "../services/mockComments";
 import { useEffect, useState } from "react";
 import type { Account } from "../services/mockAccounts";
 import { mastersApi } from "../services/mastersApi";
+import { commentsApi } from "../services/commentsApi";
 
 interface Props {
   currentUser: Account;
@@ -53,24 +54,24 @@ const MasterDetail = ({ currentUser }: Props) => {
     });
   }, [id]);
 
+  useEffect(() => {
+    if(!master) return;
+  commentsApi.getComments(master.id).then(setComments);
+}, [master?.id]);
+
   if (!master) return <Text>Majstor nije pronađen</Text>;
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
+const handleAddComment = async () => {
 
-    const comment: MasterComment = {
-      id: Date.now(),
-      masterId: master.id,
-      user: currentUser.username,
-      text: newComment,
-      date: new Date().toLocaleDateString(),
-      likes: 0,
-      dislikes: 0,
-    };
-
-    setComments([comment, ...comments]);
-    setNewComment("");
-  };
+  const comment = await commentsApi.createComment({
+    masterId: master.id,
+    user: currentUser.username,
+    text: newComment
+  });
+console.log("Created Comment:", comment);
+  setComments([comment, ...comments]);
+  setNewComment("");
+};
 
   const handleAddWork = () => {
     const imageUrl = prompt("Unesi URL slike rada:");
