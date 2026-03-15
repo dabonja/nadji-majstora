@@ -27,12 +27,13 @@ const MasterCard = ({ master }: Props) => {
       boxShadow="sm"
       transition="all 0.2s"
       cursor="pointer"
-      _hover={{
-        transform: 'translateY(-3px)',
-        boxShadow: 'lg',
-        bg: 'white',
-      }}
+     _hover={{
+  transform: "translateY(-5px)",
+  boxShadow: "xl"
+}}
+
       onClick={() => navigate(`/master/${master.id}`)}
+      
     >
       <VStack align="start" spacing={4}>
 

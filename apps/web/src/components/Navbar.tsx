@@ -1,3 +1,4 @@
+// src/components/Navbar.tsx
 import { Box, Button, HStack, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import type { Account } from '../services/mockAccounts';
@@ -15,45 +16,43 @@ const Navbar = ({ currentUser, setCurrentUser }: Props) => {
   };
 
   return (
-    <Box p={4} borderBottom="1px solid #eee">
-      <HStack justify="space-between">
+    <Box
+      bg="teal.500"
+      color="white"
+      px={6}
+      py={4}
+      boxShadow="md"
+      position="sticky"
+      top="0"
+      zIndex="1000"
+    >
+      <HStack justify="space-between" align="center">
+        <Text
+          fontWeight="extrabold"
+          fontSize="2xl"
+          cursor="pointer"
+          onClick={() => navigate('/')}
+          _hover={{ color: 'teal.200' }}
+        >
+          Nadji Majstora
+        </Text>
 
-        {/* LEFT SIDE */}
-        <HStack spacing={6}>
-          <Text fontWeight="bold" cursor="pointer" onClick={() => navigate('/')}>
-            Nadji Majstora
-          </Text>
-
-          {/* USER NAVIGATION */}
-          {currentUser.role === 'user' && (
-            <>
-              <Text cursor="pointer" onClick={() => navigate('/create-job')}>
-                Nova ponuda
-              </Text>
-
-              <Text cursor="pointer" onClick={() => navigate('/my-jobs')}>
-                Moje ponude
-              </Text>
-            </>
-          )}
-
-          {/* MASTER NAVIGATION */}
-          {currentUser.role === 'master' && (
-            <Text cursor="pointer" onClick={() => navigate('/jobs')}>
-              Ponude
-            </Text>
-          )}
-        </HStack>
-
-        {/* RIGHT SIDE */}
         <HStack spacing={4}>
-          <Text>{currentUser.username}</Text>
-
+          {currentUser.role === 'user' && (
+            <Button colorScheme="teal" variant="ghost" onClick={() => navigate('/my-jobs')}>
+              Moje Ponude
+            </Button>
+          )}
+          {currentUser.role === 'master' && (
+            <Button colorScheme="teal" variant="ghost" onClick={() => navigate('/jobs')}>
+              Sve Ponude
+            </Button>
+          )}
+          <Text fontWeight="bold">{currentUser.username}</Text>
           <Button size="sm" colorScheme="red" onClick={handleLogout}>
             Logout
           </Button>
         </HStack>
-
       </HStack>
     </Box>
   );

@@ -1,75 +1,124 @@
-// src/pages/JobDetail.tsx
-import { useParams } from 'react-router-dom';
 import {
   Box,
   VStack,
-  HStack,
   Text,
   Badge,
   Button,
+  HStack,
   Divider,
 } from '@chakra-ui/react';
-import { mockJobs } from '../services/mockJobs';
-import { masters } from '../services/mockMasters';
+import { useParams, useNavigate } from 'react-router-dom';
+import type { JobOffer } from '../services/mockJobs';
 import type { Account } from '../services/mockAccounts';
 
 interface Props {
   currentUser: Account;
+  jobs: JobOffer[];
+  setJobs: React.Dispatch<React.SetStateAction<JobOffer[]>>;
 }
 
-const JobDetail = ({ currentUser }: Props) => {
+const JobDetail = ({ currentUser, jobs, setJobs }: Props) => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const jobId = Number(id);
-  const job = mockJobs.find((j) => j.id === jobId);
+  console.log('JobDetail', { jobId, jobs });
+  const job = jobs.find((j) => j.id === jobId);
 
   if (!job) return <Text>Posao nije pronađen</Text>;
 
-  // filtriranje prijavljenih majstora
-  const appliedMasters = masters.filter((m) => job.applicants.includes(m.id));
+  const changeStatus = (status: JobOffer['status']) => {
+    setJobs((prev) =>
+      prev.map((j) =>
+        j.id === job.id ? { ...j, status } : j
+      )
+    );
+  };
+
+  const deleteJob = () => {
+    setJobs((prev) => prev.filter((j) => j.id !== job.id));
+    navigate('/my-jobs');
+  };
 
   return (
-    <Box p={6} maxW="800px" mx="auto">
-      <VStack align="start" spacing={4} bg="gray.50" p={6} borderRadius="md" shadow="md">
-        <Text fontSize="2xl" fontWeight="bold">{job.title}</Text>
-        <Badge colorScheme={job.status === 'active' ? 'green' : job.status === 'in_progress' ? 'yellow' : 'red'}>
-          {job.status === 'active' ? 'Aktivan' : job.status === 'in_progress' ? 'U toku' : 'Završeno'}
+    <Box maxW="800px" mx="auto" p={6}>
+      <VStack
+        align="start"
+        spacing={4}
+        bg="white"
+        p={6}
+        borderRadius="lg"
+        boxShadow="md"
+      >
+        <Text fontSize="2xl" fontWeight="bold">
+          {job.title}
+        </Text>
+
+        <Badge
+          colorScheme={
+            job.status === 'active'
+              ? 'green'
+              : job.status === 'in_progress'
+              ? 'yellow'
+              : 'red'
+          }
+        >
+          {job.status}
         </Badge>
 
-        <Text><strong>Opis:</strong> {job.description}</Text>
-        <Text><strong>Profesija:</strong> {job.profession}</Text>
-        <Text><strong>Budžet / Dogovor:</strong> {job.budget > 0 ? `${job.budget} RSD` : 'Dogovor'}</Text>
-        <Text><strong>Rok za završetak:</strong> {job.deadline}</Text>
-        <Text><strong>Kontakt telefon:</strong> 064/123-4567</Text>
+        <Text>{job.description}</Text>
+
+        <Text>
+          Budžet: {job.budget ? `${job.budget} RSD` : 'Dogovor'}
+        </Text>
+
+        <Text>Rok: {job.deadline}</Text>
+
+        <Text>Kontakt: {job.contact}</Text>
 
         <Divider />
 
-        {currentUser.role === 'master' ? (
-          <Text fontWeight="bold">Prijavljeno majstora: {job.applicants.length}</Text>
-        ) : (
-          <>
-            <Text fontWeight="bold">Majstori koji su se prijavili:</Text>
-            {appliedMasters.length === 0 ? (
-              <Text>Nema prijavljenih majstora</Text>
-            ) : (
-              <VStack align="start" spacing={3}>
-                {appliedMasters.map((m) => (
-                  <HStack key={m.id} justify="space-between" w="100%" p={3} bg="white" borderRadius="md" shadow="sm">
-                    <Text>{m.name}</Text>
-                    <Badge colorScheme={m.available ? 'green' : 'red'}>
-                      {m.available ? 'Dostupan' : 'Nedostupan'}
-                    </Badge>
-                  </HStack>
-                ))}
-              </VStack>
-            )}
-          </>
-        )}
+        <Text>
+          Prijavljeno majstora: {job.applicants.length}
+        </Text>
 
-        {currentUser.role === 'master' && !job.applicants.includes(currentUser.id) && job.status === 'active' && (
-          <Button colorScheme="blue" mt={4}>
-            Prijavi se na posao
-          </Button>
-        )}
+        {/* USER CONTROLS */}
+        {currentUser.role === 'user' &&
+          currentUser.id === job.userId && (
+            <VStack align="start" spacing={3} pt={4}>
+
+              <HStack>
+                <Button
+                  colorScheme="yellow"
+                  onClick={() => changeStatus('in_progress')}
+                >
+                  U toku
+                </Button>
+
+                <Button
+                  colorScheme="green"
+                  onClick={() => changeStatus('closed')}
+                >
+                  Završi posao
+                </Button>
+
+                <Button
+                  colorScheme="blue"
+                  onClick={() => changeStatus('active')}
+                >
+                  Aktiviraj
+                </Button>
+              </HStack>
+
+              <Button
+                colorScheme="red"
+                onClick={deleteJob}
+              >
+                Obriši ponudu
+              </Button>
+
+            </VStack>
+          )}
       </VStack>
     </Box>
   );

@@ -101,6 +101,17 @@ const JobCard = ({ job, currentUser, setJobs }: Props) => {
             {alreadyApplied ? 'Prijavljen' : 'Prijavi se'}
           </Button>
         )}
+        <Badge
+  colorScheme={
+    job.status === 'active'
+      ? 'green'
+      : job.status === 'in_progress'
+      ? 'yellow'
+      : 'red'
+  }
+>
+  {job.status}
+</Badge>
       </VStack>
     </Box>
   );
