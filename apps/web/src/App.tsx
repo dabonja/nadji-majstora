@@ -21,15 +21,14 @@ function App() {
   const [masters, setMasters] = useState<Master[]>(mockMasters);
   const [search, setSearch] = useState("");
 
-  const [professionFilter, setProfessionFilter] = useState("");
-  const [cityFilter, setCityFilter] = useState("");
-const updateJobStatus = (jobId: number, newStatus: 'active' | 'in_progress' | 'closed') => {
-  setJobs(prevJobs =>
-    prevJobs.map(job =>
-      job.id === jobId ? { ...job, status: newStatus } : job
-    )
-  );
-};
+  const updateJobStatus = (jobId: number, newStatus: JobOffer["status"]) => {
+    setJobs((prev) =>
+      prev.map((job) =>
+        job.id === jobId ? { ...job, status: newStatus } : job,
+      ),
+    );
+  };
+
   return (
     <ChakraProvider>
       <BrowserRouter>
@@ -50,10 +49,19 @@ const updateJobStatus = (jobId: number, newStatus: 'active' | 'in_progress' | 'c
               <Routes>
                 <Route
                   path="/"
-                  element={<Home masters={masters} search={search} currentUser={currentUser}/>}
+                  element={
+                    <Home
+                      masters={masters}
+                      search={search}
+                      currentUser={currentUser}
+                    />
+                  }
                 />
 
-                <Route path="/master/:id" element={<MasterDetail currentUser={currentUser} />} />
+                <Route
+                  path="/master/:id"
+                  element={<MasterDetail currentUser={currentUser} />}
+                />
 
                 {currentUser.role === "user" && (
                   <>
@@ -64,15 +72,27 @@ const updateJobStatus = (jobId: number, newStatus: 'active' | 'in_progress' | 'c
 
                     <Route
                       path="/my-jobs"
-                      element={<JobsList currentUser={currentUser} />}
+                      element={
+                        <JobsList
+                          currentUser={currentUser}
+                          setJobs={setJobs}
+                          jobs={jobs}
+                          updateJobStatus={updateJobStatus}
+                        />
+                      }
                     />
                   </>
                 )}
 
                 {currentUser.role === "master" && (
                   <Route
-                    path="/jobs"
-                    element={<JobsList currentUser={currentUser} />}
+                    path="/my-jobs"
+                    element={
+                      <JobsList
+                        currentUser={currentUser}
+                        setJobs={setJobs}
+                        jobs={jobs} updateJobStatus={updateJobStatus }                      />
+                    }
                   />
                 )}
 
@@ -83,7 +103,6 @@ const updateJobStatus = (jobId: number, newStatus: 'active' | 'in_progress' | 'c
                       currentUser={currentUser}
                       jobs={jobs}
                       setJobs={setJobs}
-                      updateJobStatus={updateJobStatus}
                     />
                   }
                 />

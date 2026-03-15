@@ -16,42 +16,40 @@ interface Props {
   currentUser: Account;
   jobs: JobOffer[];
   setJobs: React.Dispatch<React.SetStateAction<JobOffer[]>>;
-  updateJobStatus: (
-    jobId: number,
-    newStatus: "active" | "in_progress" | "closed",
-  ) => void;
 }
 
-const JobDetail = ({ currentUser, jobs, setJobs, updateJobStatus }: Props) => {
+const JobDetail = ({ currentUser, jobs, setJobs }: Props) => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const jobId = Number(id);
-  console.log("JobDetail", { jobId, jobs });
   const job = jobs.find((j) => j.id === jobId);
 
   if (!job) return <Text>Posao nije pronađen</Text>;
 
-  const changeStatus = (status: JobOffer["status"]) => {
+  // --- Funkcija za promenu statusa
+  const handleStatusChange = (newStatus: JobOffer["status"]) => {
     setJobs((prev) =>
-      prev.map((j) => (j.id === job.id ? { ...j, status } : j)),
+      prev.map((j) => (j.id === job.id ? { ...j, status: newStatus } : j))
     );
   };
 
-  const deleteJob = () => {
+  // --- Funkcija za brisanje posla
+  const handleDeleteJob = () => {
     setJobs((prev) => prev.filter((j) => j.id !== job.id));
     navigate("/my-jobs");
   };
 
-  const handleApply = (jobId: number) => {
-  setJobs((prevJobs) =>
-    prevJobs.map((j) =>
-      j.id === jobId
-        ? { ...j, applicants: [...j.applicants, currentUser.id] }
-        : j
-    )
-  );
-};
+  // --- Funkcija za prijavu majstora
+  const handleApply = () => {
+    if (!currentUser.id) return;
+    setJobs((prev) =>
+      prev.map((j) =>
+        j.id === job.id && !j.applicants.includes(currentUser.id)
+          ? { ...j, applicants: [...j.applicants, currentUser.id] }
+          : j
+      )
+    );
+  };
 
   return (
     <Box maxW="800px" mx="auto" p={6}>
@@ -63,53 +61,66 @@ const JobDetail = ({ currentUser, jobs, setJobs, updateJobStatus }: Props) => {
         borderRadius="lg"
         boxShadow="md"
       >
+        {/* Naslov i status */}
         <Text fontSize="2xl" fontWeight="bold">
           {job.title}
         </Text>
-
         <Badge
           colorScheme={
             job.status === "active"
               ? "green"
               : job.status === "in_progress"
-                ? "yellow"
-                : "red"
+              ? "yellow"
+              : "red"
           }
         >
           {job.status}
         </Badge>
 
+        {/* Opis posla */}
         <Text>{job.description}</Text>
-
         <Text>Budžet: {job.budget ? `${job.budget} RSD` : "Dogovor"}</Text>
-
         <Text>Rok: {job.deadline}</Text>
-
         <Text>Kontakt: {job.contact}</Text>
 
         <Divider />
 
-<HStack justifyContent="space-between" w="100%"align="center" spacing={4} py={4} px={2}>
+        {/* Prijava majstora */}
+        <HStack
+          justifyContent="space-between"
+          w="100%"
+          align="center"
+          spacing={4}
+          py={4}
+          px={2}
+        >
           <Text>Prijavljeno majstora: {job.applicants.length}</Text>
-{currentUser.role === 'master' && !job.applicants.includes(currentUser.id) && (
-  <Button colorScheme="teal" mt={4} onClick={() => handleApply(job.id)}>
-    Prijavi se na posao
-  </Button>
-)}
 
-{currentUser.role === 'master' && job.applicants.includes(currentUser.id) && (
-  <Text color="green.500" fontWeight="bold" mt={4}>
-    Već ste se prijavili
-  </Text>
-)}
-</HStack>
-        {/* USER CONTROLS */}
+          {currentUser.role === "master" &&
+            !job.applicants.includes(currentUser.id) && (
+              <Button colorScheme="teal" onClick={handleApply}>
+                Prijavi se na posao
+              </Button>
+            )}
+
+          {currentUser.role === "master" &&
+            job.applicants.includes(currentUser.id) && (
+              <Text color="green.500" fontWeight="bold">
+                Već ste se prijavili
+              </Text>
+            )}
+        </HStack>
+
+        {/* Kontrole za korisnika koji je vlasnik posla */}
         {currentUser.role === "user" && currentUser.id === job.userId && (
           <VStack align="start" spacing={3} pt={4}>
             <StatusMenu
               status={job.status}
-              onChangeStatus={(newStatus) => updateJobStatus(job.id, newStatus)}
+              onChangeStatus={handleStatusChange}
             />
+            <Button colorScheme="red" onClick={handleDeleteJob}>
+              Obriši ponudu
+            </Button>
           </VStack>
         )}
       </VStack>
