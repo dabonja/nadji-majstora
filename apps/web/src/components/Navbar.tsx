@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
-import { Box, Button, HStack, Text } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
-import type { Account } from '../services/mockAccounts';
+import { Box, Button, HStack, Text } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import type { Account } from "../services/mockAccounts";
 
 interface Props {
   currentUser: Account;
@@ -31,23 +31,41 @@ const Navbar = ({ currentUser, setCurrentUser }: Props) => {
           fontWeight="extrabold"
           fontSize="2xl"
           cursor="pointer"
-          onClick={() => navigate('/')}
-          _hover={{ color: 'teal.200' }}
+          onClick={() => navigate("/")}
+          _hover={{ color: "teal.200" }}
         >
           Nadji Majstora
         </Text>
 
         <HStack spacing={4}>
-          {currentUser.role === 'user' && (
-            <Button colorScheme="teal" variant="ghost" onClick={() => navigate('/my-jobs')}>
+          {currentUser.role === "user" && (
+            <Button
+              colorScheme="teal"
+              variant="ghost"
+              onClick={() => navigate("/my-jobs")}
+            >
               Moje Ponude
             </Button>
           )}
-          {currentUser.role === 'master' && (
-            <Button colorScheme="teal" variant="ghost" onClick={() => navigate('/jobs')}>
+          {currentUser.role === "master" && (
+            <Button
+              colorScheme="teal"
+              variant="ghost"
+              onClick={() => navigate("/jobs")}
+            >
               Sve Ponude
             </Button>
           )}
+          {currentUser.role === "master" && (
+            <Button
+              size="sm"
+              colorScheme="blue"
+              onClick={() => navigate("/register-master")}
+            >
+              Postani majstor
+            </Button>
+          )}
+
           <Text fontWeight="bold">{currentUser.username}</Text>
           <Button size="sm" colorScheme="red" onClick={handleLogout}>
             Logout

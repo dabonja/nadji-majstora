@@ -70,6 +70,9 @@ const MasterCard = ({ master }: Props) => {
         <Text fontSize="sm" color="gray.600">
           Iskustvo: {master.experience} godina
         </Text>
+        <Text fontSize="sm" color="gray.600">
+📍 {master.city}
+</Text>
 
         {/* AVAILABILITY */}
         <Badge

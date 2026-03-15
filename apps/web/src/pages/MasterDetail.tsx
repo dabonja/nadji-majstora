@@ -2,12 +2,12 @@
 import { useParams } from 'react-router-dom';
 import { Box, Text, VStack, HStack, Badge, Image, Avatar, IconButton } from '@chakra-ui/react';
 import { ArrowDownIcon, ArrowUpIcon, StarIcon } from '@chakra-ui/icons';
-import { masters } from '../services/mockMasters';
+import { mockMasters } from '../services/mockMasters';
 import { mockComments } from '../services/mockComments';
 
 const MasterDetail = () => {
   const { id } = useParams();
-  const master = masters.find((m) => m.id === Number(id));
+  const master = mockMasters.find((m) => m.id === Number(id));
 
   if (!master) return <Text>Majstor nije pronađen</Text>;
 

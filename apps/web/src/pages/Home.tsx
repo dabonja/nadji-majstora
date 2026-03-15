@@ -9,7 +9,7 @@ import {
   HStack,
 } from '@chakra-ui/react';
 import MasterCard from '../components/MasterCard';
-import { masters } from '../services/mockMasters';
+import { mockMasters } from '../services/mockMasters';
 import type { Account } from '../services/mockAccounts';
 import { useNavigate } from 'react-router-dom';
 
@@ -62,7 +62,7 @@ const Home = ({ currentUser }: Props) => {
           </Heading>
 
           <Text color="gray.500">
-            {masters.length} majstora dostupno
+            {mockMasters.length} majstora dostupno
           </Text>
         </HStack>
 
@@ -74,7 +74,7 @@ const Home = ({ currentUser }: Props) => {
           }}
           gap={6}
         >
-          {masters.map((m) => (
+          {mockMasters.map((m) => (
             <GridItem key={m.id}>
               <MasterCard master={m} />
             </GridItem>

@@ -12,10 +12,14 @@ import JobDetail from './pages/JobDetail';
 
 import type { Account } from './services/mockAccounts';
 import { mockJobs, type JobOffer } from './services/mockJobs';
+import { mockMasters, type Master, } from "./services/mockMasters"
+import RegisterMaster from './pages/RegisterMaster';
+
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Account | null>(null);
 const [jobs, setJobs] = useState<JobOffer[]>(mockJobs);
+const [masters,setMasters] = useState<Master[]>(mockMasters)
 
   return (
     <ChakraProvider>
@@ -68,6 +72,10 @@ const [jobs, setJobs] = useState<JobOffer[]>(mockJobs);
       setJobs={setJobs}
     />
   }
+/>
+<Route
+ path="/register-master"
+ element={<RegisterMaster masters={masters} setMasters={setMasters} />}
 />
 
                 <Route path="*" element={<Navigate to="/" />} />
