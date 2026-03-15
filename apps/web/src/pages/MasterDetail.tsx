@@ -10,10 +10,19 @@ import {
   IconButton,
   Input,
   Button,
+  Grid,
+  GridItem,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { ArrowDownIcon, ArrowUpIcon, StarIcon } from '@chakra-ui/icons';
-import { mockMasters, type Master } from '../services/mockMasters';
-import { mockComments, type MasterComment} from '../services/mockComments';
+import { mockMasters, type Master, mockMasterWorks, type MasterWork } from '../services/mockMasters';
+import { mockComments, type MasterComment } from '../services/mockComments';
 import { useState } from 'react';
 import type { Account } from '../services/mockAccounts';
 
@@ -25,9 +34,11 @@ const MasterDetail = ({ currentUser }: Props) => {
   const { id } = useParams();
   const master = mockMasters.find((m) => m.id === Number(id));
 
- 
   const [comments, setComments] = useState<MasterComment[]>(mockComments);
   const [newComment, setNewComment] = useState('');
+  const [works, setWorks] = useState<MasterWork[]>(mockMasterWorks);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   if (!master) return <Text>Majstor nije pronađen</Text>;
 
@@ -48,9 +59,27 @@ const MasterDetail = ({ currentUser }: Props) => {
     setNewComment('');
   };
 
+  const handleAddWork = () => {
+    const imageUrl = prompt('Unesi URL slike rada:');
+    const title = prompt('Unesi naslov rada:');
+    if (!imageUrl || !title) return;
+
+    const newWork: MasterWork = {
+      id: Date.now(),
+      masterId: master.id,
+      image: imageUrl,
+      title,
+    };
+
+    setWorks([newWork, ...works]);
+  };
+
+  const masterWorks = works.filter((w) => w.masterId === master.id);
+
   return (
     <Box p={6}>
       <VStack align="start" spacing={4}>
+        {/* INFO O MAJSTORU */}
         <Image
           src={master.image || `https://i.pravatar.cc/150?u=${master.id}`}
           alt={master.name}
@@ -76,6 +105,38 @@ const MasterDetail = ({ currentUser }: Props) => {
         <Text>Iskustvo: {master.experience} godine</Text>
         <Text>Opis: Vrlo pouzdan i stručan majstor.</Text>
 
+        {/* DUGMAD ZA RADOVE */}
+        <HStack spacing={4} mt={4}>
+          <Button colorScheme="teal" onClick={onOpen}>
+            Vidi radove ({masterWorks.length})
+          </Button>
+
+          {currentUser.role === 'master' && currentUser.id === master.id && (
+            <Button colorScheme="blue" onClick={handleAddWork}>
+              Dodaj radove
+            </Button>
+          )}
+        </HStack>
+
+        {/* MODAL GALERIJE */}
+        <Modal isOpen={isOpen} onClose={onClose} size="xl">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Radovi majstora</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Grid templateColumns="repeat(3, 1fr)" gap={4}>
+                {masterWorks.map((work) => (
+                  <GridItem key={work.id}>
+                    <Image src={work.image} alt={work.title} borderRadius="md" />
+                    <Text mt={1}>{work.title}</Text>
+                  </GridItem>
+                ))}
+              </Grid>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
         {/* KOMENTARI */}
         <Text fontSize="xl" fontWeight="bold" mt={8}>
           Komentari
@@ -94,24 +155,26 @@ const MasterDetail = ({ currentUser }: Props) => {
           </HStack>
         )}
 
-        {comments.map((c) => (
-          <Box key={c.id} p={3} borderWidth="1px" borderRadius="md" w="100%">
-            <HStack spacing={3} mb={2}>
-              <Avatar size="sm" name={c.user} />
-              <Text fontWeight="bold">{c.user}</Text>
-              <Text color="gray.500" fontSize="sm">
-                {c.date}
-              </Text>
-            </HStack>
-            <Text mb={2}>{c.text}</Text>
-            <HStack spacing={2}>
-              <IconButton aria-label="Like" icon={<ArrowUpIcon />} size="sm" />
-              <Text>{c.likes}</Text>
-              <IconButton aria-label="Dislike" icon={<ArrowDownIcon />} size="sm" />
-              <Text>{c.dislikes}</Text>
-            </HStack>
-          </Box>
-        ))}
+        {comments
+          .filter((c) => c.masterId === master.id)
+          .map((c) => (
+            <Box key={c.id} p={3} borderWidth="1px" borderRadius="md" w="100%">
+              <HStack spacing={3} mb={2}>
+                <Avatar size="sm" name={c.user} />
+                <Text fontWeight="bold">{c.user}</Text>
+                <Text color="gray.500" fontSize="sm">
+                  {c.date}
+                </Text>
+              </HStack>
+              <Text mb={2}>{c.text}</Text>
+              <HStack spacing={2}>
+                <IconButton aria-label="Like" icon={<ArrowUpIcon />} size="sm" />
+                <Text>{c.likes}</Text>
+                <IconButton aria-label="Dislike" icon={<ArrowDownIcon />} size="sm" />
+                <Text>{c.dislikes}</Text>
+              </HStack>
+            </Box>
+          ))}
       </VStack>
     </Box>
   );

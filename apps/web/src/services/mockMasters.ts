@@ -35,3 +35,18 @@ export const mockMasters: Master[] = [
   { id: 20, name: "Filip Stanković", profession: "vodoinstalater", rating: 4.9, available: true, experience: 14, reviews: 42, city: "Novi Sad", phone: "0662222222", image: "https://i.pravatar.cc/150?img=76" },
   { id: 21, name: "Tanja Petrović", profession: "tesar", rating: 4.6, available: true, experience: 12, reviews: 29, city: "Niš", phone: "0662223333", image: "https://i.pravatar.cc/150?img=86" },
 ];
+
+// src/services/mockMasters.ts
+export interface MasterWork {
+  id: number;
+  masterId: number;
+  title: string;
+  image: string;
+}
+
+export const mockMasterWorks: MasterWork[] = [
+  { id: 1, masterId: 1, title: "Popravka kuhinje", image: "https://via.placeholder.com/300" },
+  { id: 2, masterId: 1, title: "Postavljanje pločica", image: "https://via.placeholder.com/300" },
+  { id: 3, masterId: 2, title: "Električarski rad", image: "https://via.placeholder.com/300" },
+  // ...
+];

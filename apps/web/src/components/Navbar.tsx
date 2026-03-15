@@ -1,3 +1,4 @@
+// src/components/Navbar.tsx
 import { Box, Button, HStack, Text, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import type { Account } from "../services/mockAccounts";
@@ -6,7 +7,7 @@ interface Props {
   currentUser: Account;
   setCurrentUser: React.Dispatch<React.SetStateAction<Account | null>>;
   search: string;
-  setSearch: (v: string) => void;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
@@ -17,35 +18,59 @@ const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
   };
 
   return (
-    <Box p={4} borderBottom="1px solid #eee" bg="gray.50">
+    <Box p={4} borderBottom="1px solid #eee" bg="teal.500" color="white">
       <HStack justify="space-between">
         <Text
           fontWeight="bold"
-          fontSize="lg"
+          fontSize="xl"
           cursor="pointer"
           onClick={() => navigate("/")}
         >
           Nadji Majstora
         </Text>
 
-        <Input
-          placeholder="Pretraži majstora ili profesiju..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          width="300px"
-          bg="white"
-        />
+        <HStack spacing={4}>
+          {/* Search bar */}
+          <Input
+            placeholder="Pretraži majstore..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            bg="white"
+            color="black"
+            size="sm"
+          />
 
-        <HStack>
-          {currentUser.role === "master" && (
-            <Button
-              size="sm"
-              colorScheme="teal"
-              onClick={() => navigate("/register-master")}
-            >
-              Registruj se kao majstor
-            </Button>
-          )}
+          {/* Dugme za ponude */}
+          <HStack spacing={4}>
+            {currentUser.role === "user" && (
+              <Button
+                size="sm"
+                colorScheme="orange"
+                onClick={() => navigate("/my-jobs")}
+              >
+                Moje ponude
+              </Button>
+            )}
+            {currentUser.role === "master" && (
+              <Button
+                size="sm"
+                colorScheme="orange"
+                onClick={() => navigate("/jobs")}
+              >
+                Sve ponude
+              </Button>
+            )}
+            {currentUser.role === "master" && (
+              <Button
+                size="sm"
+                colorScheme="blue"
+                onClick={() => navigate("/register-master")}
+              >
+                Uredi profil
+              </Button>
+            )}
+          </HStack>
+
           <Text>{currentUser.username}</Text>
 
           <Button size="sm" colorScheme="red" onClick={handleLogout}>

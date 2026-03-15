@@ -20,18 +20,6 @@ interface Props {
 const JobCard = ({ job, currentUser, setJobs }: Props) => {
   const navigate = useNavigate();
 
-  const alreadyApplied = job.applicants.includes(currentUser.id);
-
-  const apply = () => {
-    setJobs((prev) =>
-      prev.map((j) =>
-        j.id === job.id
-          ? { ...j, applicants: [...j.applicants, currentUser.id] }
-          : j
-      )
-    );
-  };
-
   return (
     <Box
       bg="gray.50"
@@ -86,21 +74,6 @@ const JobCard = ({ job, currentUser, setJobs }: Props) => {
             Rok: {job.deadline}
           </Text>
         </HStack>
-
-        {/* APPLY BUTTON */}
-        {currentUser.role === 'master' && (
-          <Button
-            size="sm"
-            colorScheme="green"
-            isDisabled={alreadyApplied}
-            onClick={(e) => {
-              e.stopPropagation();
-              apply();
-            }}
-          >
-            {alreadyApplied ? 'Prijavljen' : 'Prijavi se'}
-          </Button>
-        )}
         <Badge
   colorScheme={
     job.status === 'active'

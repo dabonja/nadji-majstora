@@ -25,35 +25,39 @@ const Home = ({ currentUser, masters, search }: Props) => {
   const navigate = useNavigate();
   const [professionFilter, setProfessionFilter] = useState("");
   const [cityFilter, setCityFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showAll, setShowAll] = useState(false);
+  const itemsPerPage = 6;
 
-  // Dinamičke opcije za filtere
-  const professions = Array.from(new Set(masters.map((m) => m.profession)));
-  const cities = Array.from(new Set(masters.map((m) => m.city)));
-
-  // Filtrirani majstori
   const filteredMasters = masters.filter((m) => {
     const matchSearch =
       m.name.toLowerCase().includes(search.toLowerCase()) ||
       m.profession.toLowerCase().includes(search.toLowerCase());
-
     const matchProfession = !professionFilter || m.profession === professionFilter;
     const matchCity = !cityFilter || m.city === cityFilter;
-
     return matchSearch && matchProfession && matchCity;
   });
 
+  const totalPages = Math.ceil(filteredMasters.length / itemsPerPage);
+
+  // Ako showAll = true, prikazujemo sve
+  const displayedMasters = showAll
+    ? filteredMasters
+    : filteredMasters.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
+
   return (
     <Box bg="gray.50" minH="100vh">
-      {/* HERO SECTION */}
+      {/* HERO */}
       <Box bg="teal.500" color="white" py={16} px={6} textAlign="center">
         <VStack spacing={4}>
           <Heading size="2xl">Pronađi Majstora Za Svaki Posao</Heading>
-
           <Text fontSize="lg" maxW="600px">
             Brzo i jednostavno pronađi električara, vodoinstalatera, stolara i
             druge majstore u tvojoj blizini.
           </Text>
-
           {currentUser.role === "user" && (
             <Button
               size="lg"
@@ -66,68 +70,80 @@ const Home = ({ currentUser, masters, search }: Props) => {
         </VStack>
       </Box>
 
-      {/* MASTERS SECTION */}
+      {/* MASTERS */}
       <Box maxW="1200px" mx="auto" p={6}>
-        <HStack justify="space-between" mb={4} flexWrap="wrap">
+        <HStack justify="space-between" mb={6}>
           <Heading size="lg" color="gray.700">
             Dostupni majstori
           </Heading>
 
-          <Text color="gray.500" mt={{ base: 2, md: 0 }}>
-            {filteredMasters.length} od {masters.length} majstora prikazano
-          </Text>
+          <HStack spacing={4}>
+            <Select
+              placeholder="Profesija"
+              value={professionFilter}
+              onChange={(e) => setProfessionFilter(e.target.value)}
+            >
+              <option value="električar">Električar</option>
+              <option value="vodoinstalater">Vodoinstalater</option>
+              <option value="stolar">Stolar</option>
+              <option value="keramičar">Keramičar</option>
+            </Select>
+
+            <Select
+              placeholder="Grad"
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
+            >
+              <option value="Beograd">Beograd</option>
+              <option value="Novi Sad">Novi Sad</option>
+              <option value="Niš">Niš</option>
+              <option value="Kragujevac">Kragujevac</option>
+            </Select>
+          </HStack>
         </HStack>
 
-        {/* FILTERS */}
-        <HStack mb={6} spacing={4} flexWrap="wrap">
-          <Select
-            placeholder="Profesija"
-            value={professionFilter}
-            onChange={(e) => setProfessionFilter(e.target.value)}
-          >
-            {professions.map((p) => (
-              <option key={p} value={p}>
-                {p.charAt(0).toUpperCase() + p.slice(1)}
-              </option>
-            ))}
-          </Select>
-
-          <Select
-            placeholder="Grad"
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-          >
-            {cities.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </Select>
-        </HStack>
-
-        {/* GRID */}
         <Grid
           templateColumns={{
             base: "1fr",
             md: "repeat(2, 1fr)",
             lg: "repeat(3, 1fr)",
           }}
-          gap={6}
+          gap={4}
         >
-          {filteredMasters.map((m) => (
-            <GridItem
-              key={m.id}
-              bg="white"
-              p={4}
-              borderRadius="md"
-              shadow="sm"
-              transition="all 0.2s"
-              _hover={{ shadow: "md", transform: "scale(1.03)" }}
-            >
-              <MasterCard master={m} />
+          {displayedMasters.map((m) => (
+            <GridItem key={m.id}>
+              <MasterCard master={m}  />
             </GridItem>
           ))}
         </Grid>
+
+        {/* PAGINACIJA / VIDI SVE */}
+        <HStack justify="center" mt={6} spacing={4}>
+          {!showAll && (
+            <>
+              <Button
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                isDisabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <Text>
+                Stranica {currentPage} od {totalPages}
+              </Text>
+              <Button
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                isDisabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+              <Button size="sm" colorScheme="teal" onClick={() => setShowAll(true)}>
+                Vidi sve
+              </Button>
+            </>
+          )}
+        </HStack>
       </Box>
     </Box>
   );

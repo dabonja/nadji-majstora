@@ -43,6 +43,16 @@ const JobDetail = ({ currentUser, jobs, setJobs, updateJobStatus }: Props) => {
     navigate("/my-jobs");
   };
 
+  const handleApply = (jobId: number) => {
+  setJobs((prevJobs) =>
+    prevJobs.map((j) =>
+      j.id === jobId
+        ? { ...j, applicants: [...j.applicants, currentUser.id] }
+        : j
+    )
+  );
+};
+
   return (
     <Box maxW="800px" mx="auto" p={6}>
       <VStack
@@ -79,8 +89,20 @@ const JobDetail = ({ currentUser, jobs, setJobs, updateJobStatus }: Props) => {
 
         <Divider />
 
-        <Text>Prijavljeno majstora: {job.applicants.length}</Text>
+<HStack justifyContent="space-between" w="100%"align="center" spacing={4} py={4} px={2}>
+          <Text>Prijavljeno majstora: {job.applicants.length}</Text>
+{currentUser.role === 'master' && !job.applicants.includes(currentUser.id) && (
+  <Button colorScheme="teal" mt={4} onClick={() => handleApply(job.id)}>
+    Prijavi se na posao
+  </Button>
+)}
 
+{currentUser.role === 'master' && job.applicants.includes(currentUser.id) && (
+  <Text color="green.500" fontWeight="bold" mt={4}>
+    Već ste se prijavili
+  </Text>
+)}
+</HStack>
         {/* USER CONTROLS */}
         {currentUser.role === "user" && currentUser.id === job.userId && (
           <VStack align="start" spacing={3} pt={4}>
