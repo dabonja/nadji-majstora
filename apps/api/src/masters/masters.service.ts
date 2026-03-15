@@ -1,36 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { mockMasters } from './mockMasters';
+import { CreateMasterDto } from './dto/create-master.dto';
 
 @Injectable()
 export class MastersService {
-  private masters = [
-    {
-      id: 1,
-      name: 'Marko Petrović',
-      profession: 'Vodoinstalater',
-      city: 'Beograd',
-      phone: '064123456',
-      rating: 4.8,
-    },
-    {
-      id: 2,
-      name: 'Ivan Jovanović',
-      profession: 'Električar',
-      city: 'Novi Sad',
-      phone: '063222333',
-      rating: 4.7,
-    },
-    {
-      id: 3,
-      name: 'Petar Nikolić',
-      profession: 'Vodoinstalater',
-      city: 'Beograd',
-      phone: '065999888',
-      rating: 4.9,
-    },
-  ];
-
   findAll(profession?: string, city?: string) {
-    let result = this.masters;
+    let result = mockMasters;
 
     if (profession) {
       result = result.filter(
@@ -45,5 +20,23 @@ export class MastersService {
     }
 
     return result;
+  }
+
+  findOne(id: number) {
+    return mockMasters.find((m) => m.id === id);
+  }
+
+  createMaster(data: CreateMasterDto) {
+    const newMaster = {
+      id: Date.now(),
+      rating: 0,
+      reviews: 0,
+      available: true,
+      ...data,
+    };
+
+    mockMasters.push(newMaster);
+
+    return newMaster;
   }
 }

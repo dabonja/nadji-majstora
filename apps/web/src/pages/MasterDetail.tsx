@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 import {
   Box,
   Text,
@@ -19,12 +19,17 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-} from '@chakra-ui/react';
-import { ArrowDownIcon, ArrowUpIcon, StarIcon } from '@chakra-ui/icons';
-import { mockMasters, type Master, mockMasterWorks, type MasterWork } from '../services/mockMasters';
-import { mockComments, type MasterComment } from '../services/mockComments';
-import { useState } from 'react';
-import type { Account } from '../services/mockAccounts';
+} from "@chakra-ui/react";
+import { ArrowDownIcon, ArrowUpIcon, StarIcon } from "@chakra-ui/icons";
+import {
+  type Master,
+  mockMasterWorks,
+  type MasterWork,
+} from "../services/mockMasters";
+import { mockComments, type MasterComment } from "../services/mockComments";
+import { useEffect, useState } from "react";
+import type { Account } from "../services/mockAccounts";
+import { mastersApi } from "../services/mastersApi";
 
 interface Props {
   currentUser: Account;
@@ -32,13 +37,21 @@ interface Props {
 
 const MasterDetail = ({ currentUser }: Props) => {
   const { id } = useParams();
-  const master = mockMasters.find((m) => m.id === Number(id));
 
   const [comments, setComments] = useState<MasterComment[]>(mockComments);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [works, setWorks] = useState<MasterWork[]>(mockMasterWorks);
+  const [master, setMaster] = useState<Master | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  useEffect(() => {
+    if (!id) return;
+
+    mastersApi.getMasterById(Number(id)).then((data) => {
+      setMaster(data);
+    });
+  }, [id]);
 
   if (!master) return <Text>Majstor nije pronađen</Text>;
 
@@ -56,12 +69,12 @@ const MasterDetail = ({ currentUser }: Props) => {
     };
 
     setComments([comment, ...comments]);
-    setNewComment('');
+    setNewComment("");
   };
 
   const handleAddWork = () => {
-    const imageUrl = prompt('Unesi URL slike rada:');
-    const title = prompt('Unesi naslov rada:');
+    const imageUrl = prompt("Unesi URL slike rada:");
+    const title = prompt("Unesi naslov rada:");
     if (!imageUrl || !title) return;
 
     const newWork: MasterWork = {
@@ -75,7 +88,7 @@ const MasterDetail = ({ currentUser }: Props) => {
   };
 
   const masterWorks = works.filter((w) => w.masterId === master.id);
-
+  console.log("Master Works:", master);
   return (
     <Box p={6}>
       <VStack align="start" spacing={4}>
@@ -86,19 +99,21 @@ const MasterDetail = ({ currentUser }: Props) => {
           borderRadius="full"
           boxSize="150px"
         />
-        <Text fontSize="2xl" fontWeight="bold">{master.name}</Text>
+        <Text fontSize="2xl" fontWeight="bold">
+          {master.name}
+        </Text>
         <Text fontSize="lg">{master.profession}</Text>
         <HStack>
           {[...Array(5)].map((_, i) => (
             <StarIcon
               key={i}
-              color={i < Math.round(master.rating) ? 'yellow.400' : 'gray.300'}
+              color={i < Math.round(master.rating) ? "yellow.400" : "gray.300"}
             />
           ))}
           <Text>({master.rating})</Text>
         </HStack>
-        <Badge colorScheme={master.available ? 'green' : 'red'}>
-          {master.available ? 'Dostupan' : 'Nedostupan'}
+        <Badge colorScheme={master.available ? "green" : "red"}>
+          {master.available ? "Dostupan" : "Nedostupan"}
         </Badge>
         <Text>Telefon: {master.phone}</Text>
         <Text>Grad: {master.city}</Text>
@@ -111,7 +126,7 @@ const MasterDetail = ({ currentUser }: Props) => {
             Vidi radove ({masterWorks.length})
           </Button>
 
-          {currentUser.role === 'master' && currentUser.id === master.id && (
+          {currentUser.role === "master" && currentUser.id === master.id && (
             <Button colorScheme="blue" onClick={handleAddWork}>
               Dodaj radove
             </Button>
@@ -128,7 +143,11 @@ const MasterDetail = ({ currentUser }: Props) => {
               <Grid templateColumns="repeat(3, 1fr)" gap={4}>
                 {masterWorks.map((work) => (
                   <GridItem key={work.id}>
-                    <Image src={work.image} alt={work.title} borderRadius="md" />
+                    <Image
+                      src={work.image}
+                      alt={work.title}
+                      borderRadius="md"
+                    />
                     <Text mt={1}>{work.title}</Text>
                   </GridItem>
                 ))}
@@ -142,7 +161,7 @@ const MasterDetail = ({ currentUser }: Props) => {
           Komentari
         </Text>
 
-        {currentUser.role === 'user' && (
+        {currentUser.role === "user" && (
           <HStack w="100%" mb={4}>
             <Input
               placeholder="Ostavite komentar"
@@ -168,9 +187,17 @@ const MasterDetail = ({ currentUser }: Props) => {
               </HStack>
               <Text mb={2}>{c.text}</Text>
               <HStack spacing={2}>
-                <IconButton aria-label="Like" icon={<ArrowUpIcon />} size="sm" />
+                <IconButton
+                  aria-label="Like"
+                  icon={<ArrowUpIcon />}
+                  size="sm"
+                />
                 <Text>{c.likes}</Text>
-                <IconButton aria-label="Dislike" icon={<ArrowDownIcon />} size="sm" />
+                <IconButton
+                  aria-label="Dislike"
+                  icon={<ArrowDownIcon />}
+                  size="sm"
+                />
                 <Text>{c.dislikes}</Text>
               </HStack>
             </Box>

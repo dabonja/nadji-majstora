@@ -109,7 +109,7 @@ function App() {
                 <Route
                   path="/register-master"
                   element={
-                    <RegisterMaster masters={masters} setMasters={setMasters} />
+                    <RegisterMaster/>
                   }
                 />
 

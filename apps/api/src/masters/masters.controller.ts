@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Param, Post, Body } from '@nestjs/common';
 import { MastersService } from './masters.service';
+import { CreateMasterDto } from './dto/create-master.dto';
 
 @Controller('masters')
 export class MastersController {
@@ -11,5 +12,15 @@ export class MastersController {
     @Query('city') city?: string,
   ) {
     return this.mastersService.findAll(profession, city);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.mastersService.findOne(Number(id));
+  }
+
+  @Post()
+  create(@Body() data: CreateMasterDto) {
+    return this.mastersService.createMaster(data);
   }
 }

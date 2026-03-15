@@ -1,7 +1,7 @@
 // src/pages/JobsList.tsx
 import { VStack, Text } from '@chakra-ui/react';
 import JobCard from '../components/JobCard';
-import { mockJobs, type JobOffer } from '../services/mockJobs';
+import { type JobOffer } from '../services/mockJobs';
 import type { Account } from '../services/mockAccounts';
 
 interface Props {

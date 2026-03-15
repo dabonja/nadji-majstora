@@ -13,7 +13,8 @@ import MasterCard from "../components/MasterCard";
 import type { Master } from "../services/mockMasters";
 import type { Account } from "../services/mockAccounts";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { mastersApi } from "../services/mastersApi";
 
 interface Props {
   masters: Master[];
@@ -21,13 +22,18 @@ interface Props {
   currentUser: Account;
 }
 
-const Home = ({ currentUser, masters, search }: Props) => {
+const Home = ({ currentUser, search }: Props) => {
   const navigate = useNavigate();
   const [professionFilter, setProfessionFilter] = useState("");
   const [cityFilter, setCityFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showAll, setShowAll] = useState(false);
   const itemsPerPage = 6;
+  const [masters, setMasters] = useState<Master[]>([]);
+
+  useEffect(() => {
+    mastersApi.getMasters().then(setMasters);
+  }, []);
 
   const filteredMasters = masters.filter((m) => {
     const matchSearch =
@@ -47,7 +53,7 @@ const Home = ({ currentUser, masters, search }: Props) => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
       );
-
+console.log("Displayed Masters:", displayedMasters);
   return (
     <Box bg="gray.50" minH="100vh">
       {/* HERO */}

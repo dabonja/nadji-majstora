@@ -11,14 +11,10 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Master } from "../services/mockMasters";
 
-interface Props {
-  masters: Master[];
-  setMasters: React.Dispatch<React.SetStateAction<Master[]>>;
-}
+import { mastersApi } from "../services/mastersApi";
 
-const RegisterMaster = ({ masters, setMasters }: Props) => {
+const RegisterMaster = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -28,23 +24,24 @@ const RegisterMaster = ({ masters, setMasters }: Props) => {
   const [phone, setPhone] = useState("");
   const [image, setImage] = useState("");
 
-  const handleSubmit = () => {
-    const newMaster: Master = {
-      id: Date.now(),
+const handleSubmit = async () => {
+  try {
+    await mastersApi.createMaster({
       name,
       profession,
-      rating: 0,
-      available: true,
-      experience: Number(experience),
-      reviews: 0,
       city,
       phone,
-      image: image || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
-    };
+      experience: Number(experience),
+      image:
+        image ||
+        `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+    });
 
-    setMasters([...masters, newMaster]);
     navigate("/");
-  };
+  } catch (error) {
+    console.error("Greška pri registraciji majstora", error);
+  }
+};
 
   return (
     <Box
