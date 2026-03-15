@@ -5,8 +5,12 @@ export class ApiClient {
     this.baseUrl = baseUrl;
   }
 
+    private buildUrl(path: string) {
+    return `${this.baseUrl}${path}`;
+  }
+
   async get(endpoint: string) {
-    const res = await fetch(`${this.baseUrl}${endpoint}`);
+    const res = await fetch(this.buildUrl(endpoint));
 
     if (!res.ok) {
       throw new Error("API error");
@@ -16,7 +20,7 @@ export class ApiClient {
   }
 
   async post(endpoint: string, body: any) {
-    const res = await fetch(`${this.baseUrl}${endpoint}`, {
+    const res = await fetch(this.buildUrl(endpoint), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,6 +33,14 @@ export class ApiClient {
     }
 
     return res.json();
+  }
+
+    patch(path: string, data: any) {
+    return fetch(this.buildUrl(path), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }).then(res => res.json());
   }
 }
 

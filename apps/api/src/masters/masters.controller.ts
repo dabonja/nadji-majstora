@@ -1,4 +1,12 @@
-import { Controller, Get, Query, Param, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  Post,
+  Body,
+  Patch,
+} from '@nestjs/common';
 import { MastersService } from './masters.service';
 import { CreateMasterDto } from './dto/create-master.dto';
 
@@ -22,5 +30,10 @@ export class MastersController {
   @Post()
   create(@Body() data: CreateMasterDto) {
     return this.mastersService.createMaster(data);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() data: any) {
+    return this.mastersService.updateMaster(Number(id), data);
   }
 }

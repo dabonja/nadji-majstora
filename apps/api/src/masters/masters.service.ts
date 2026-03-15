@@ -39,4 +39,26 @@ export class MastersService {
 
     return newMaster;
   }
+
+  updateMaster(
+    id: number,
+    data: Partial<{
+      name: string;
+      profession: string;
+      city: string;
+      phone: string;
+      available: boolean;
+      image: string;
+    }>,
+  ) {
+    const masterIndex = mockMasters.findIndex((m) => m.id === id);
+    if (masterIndex === -1) return null;
+
+    mockMasters[masterIndex] = {
+      ...mockMasters[masterIndex],
+      ...data,
+    };
+
+    return mockMasters[masterIndex];
+  }
 }

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Box, ChakraProvider } from "@chakra-ui/react";
+import { Box, Button, ChakraProvider } from "@chakra-ui/react";
 import { useState, type SetStateAction } from "react";
 
 import Navbar from "./components/Navbar";
@@ -14,6 +14,7 @@ import type { Account } from "./services/mockAccounts";
 import { mockJobs, type JobOffer } from "./services/mockJobs";
 import { mockMasters, type Master } from "./services/mockMasters";
 import RegisterMaster from "./pages/RegisterMaster";
+import MasterProfile from "./components/MasterProfile";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Account | null>(null);
@@ -91,7 +92,9 @@ function App() {
                       <JobsList
                         currentUser={currentUser}
                         setJobs={setJobs}
-                        jobs={jobs} updateJobStatus={updateJobStatus }                      />
+                        jobs={jobs}
+                        updateJobStatus={updateJobStatus}
+                      />
                     }
                   />
                 )}
@@ -106,12 +109,14 @@ function App() {
                     />
                   }
                 />
-                <Route
-                  path="/register-master"
-                  element={
-                    <RegisterMaster/>
-                  }
-                />
+                <Route path="/register-master" element={<RegisterMaster />} />
+
+                {currentUser?.role === "master" && (
+                  <Route
+                    path="/profile"
+                    element={<MasterProfile currentUser={currentUser} />}
+                  />
+                )}
 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

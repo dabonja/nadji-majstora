@@ -66,6 +66,15 @@ const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
                 colorScheme="blue"
                 onClick={() => navigate("/register-master")}
               >
+                Registruj se
+              </Button>
+            )}
+                 {currentUser.role === "master" && (
+              <Button
+                size="sm"
+                colorScheme="yellow"
+                onClick={() => navigate("/profile")}
+              >
                 Uredi profil
               </Button>
             )}

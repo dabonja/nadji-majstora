@@ -33,6 +33,17 @@ class MastersApi {
   createMaster(data: CreateMasterDto) {
     return this.api.post(`/masters`, data);
   }
+
+  updateMaster(id: number, data: Partial<{
+  name: string;
+  profession: string;
+  city: string;
+  phone: string;
+  available: boolean;
+  image: string;
+}>) {
+  return this.api.patch(`/masters/${id}`, data);
+}
   
 }
 
