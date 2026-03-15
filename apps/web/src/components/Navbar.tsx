@@ -1,14 +1,15 @@
-// src/components/Navbar.tsx
-import { Box, Button, HStack, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, Text, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import type { Account } from "../services/mockAccounts";
 
 interface Props {
   currentUser: Account;
   setCurrentUser: React.Dispatch<React.SetStateAction<Account | null>>;
+  search: string;
+  setSearch: (v: string) => void;
 }
 
-const Navbar = ({ currentUser, setCurrentUser }: Props) => {
+const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -16,57 +17,37 @@ const Navbar = ({ currentUser, setCurrentUser }: Props) => {
   };
 
   return (
-    <Box
-      bg="teal.500"
-      color="white"
-      px={6}
-      py={4}
-      boxShadow="md"
-      position="sticky"
-      top="0"
-      zIndex="1000"
-    >
-      <HStack justify="space-between" align="center">
+    <Box p={4} borderBottom="1px solid #eee" bg="gray.50">
+      <HStack justify="space-between">
         <Text
-          fontWeight="extrabold"
-          fontSize="2xl"
+          fontWeight="bold"
+          fontSize="lg"
           cursor="pointer"
           onClick={() => navigate("/")}
-          _hover={{ color: "teal.200" }}
         >
           Nadji Majstora
         </Text>
 
-        <HStack spacing={4}>
-          {currentUser.role === "user" && (
-            <Button
-              colorScheme="teal"
-              variant="ghost"
-              onClick={() => navigate("/my-jobs")}
-            >
-              Moje Ponude
-            </Button>
-          )}
-          {currentUser.role === "master" && (
-            <Button
-              colorScheme="teal"
-              variant="ghost"
-              onClick={() => navigate("/jobs")}
-            >
-              Sve Ponude
-            </Button>
-          )}
+        <Input
+          placeholder="Pretraži majstora ili profesiju..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          width="300px"
+          bg="white"
+        />
+
+        <HStack>
           {currentUser.role === "master" && (
             <Button
               size="sm"
-              colorScheme="blue"
+              colorScheme="teal"
               onClick={() => navigate("/register-master")}
             >
-              Postani majstor
+              Registruj se kao majstor
             </Button>
           )}
+          <Text>{currentUser.username}</Text>
 
-          <Text fontWeight="bold">{currentUser.username}</Text>
           <Button size="sm" colorScheme="red" onClick={handleLogout}>
             Logout
           </Button>

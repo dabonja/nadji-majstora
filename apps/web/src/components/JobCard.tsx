@@ -118,3 +118,5 @@ const JobCard = ({ job, currentUser, setJobs }: Props) => {
 };
 
 export default JobCard;
+
+
