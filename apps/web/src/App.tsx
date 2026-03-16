@@ -133,7 +133,7 @@ console.log('currentUser', currentUser  )
                   <Route
                     path="/profile/:id"
                     element={
-                      <MasterProfile
+                      <MasterProfile currentUser={currentUser}
                       />
                     }
                   />
