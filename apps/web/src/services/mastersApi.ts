@@ -1,4 +1,5 @@
-import type { CreateMasterDto } from "../types/master";
+// src/services/mastersApi.ts
+import type {  CreateMasterDto, Master } from "../types/master";
 import { ApiClient } from "./apiClient";
 
 class MastersApi {
@@ -8,43 +9,43 @@ class MastersApi {
     this.api = new ApiClient("http://localhost:3000");
   }
 
-  getMasters(profession?: string, city?: string) {
+  // Dobavljanje svih majstora, sa opcionalnim filterima
+  getMasters(profession?: string, city?: string): Promise<Master[]> {
     let query = "";
 
     if (profession || city) {
       query = "?";
-
-      if (profession) {
-        query += `profession=${profession}`;
-      }
-
-      if (city) {
-        query += `${profession ? "&" : ""}city=${city}`;
-      }
+      if (profession) query += `profession=${profession}`;
+      if (city) query += `${profession ? "&" : ""}city=${city}`;
     }
 
-    return this.api.get(`/masters${query}`);
+    return this.api.get<Master[]>(`/masters${query}`);
   }
 
-  getMasterById(id: number) {
-    return this.api.get(`/masters/${id}`);
+  // Dobavljanje jednog majstora po ID
+  getMasterById(id: number): Promise<Master> {
+    return this.api.get<Master>(`/masters/${id}`);
   }
 
-  createMaster(data: CreateMasterDto) {
-    return this.api.post(`/masters`, data);
+  // Kreiranje novog majstora
+  createMaster(data: CreateMasterDto): Promise<Master> {
+    return this.api.post<Master>(`/masters`, data);
   }
 
-  updateMaster(id: number, data: Partial<{
-  name: string;
-  profession: string;
-  city: string;
-  phone: string;
-  available: boolean;
-  image: string;
-}>) {
-  return this.api.patch(`/masters/${id}`, data);
-}
-  
+  // Update majstora
+  updateMaster(
+    id: number,
+    data: Partial<{
+      name: string;
+      profession: string;
+      city: string;
+      phone: string;
+      available: boolean;
+      image: string;
+    }>,
+  ): Promise<Master> {
+    return this.api.patch<Master>(`/masters/${id}`, data);
+  }
 }
 
 export const mastersApi = new MastersApi();

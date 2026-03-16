@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { mockMasters } from './mockMasters';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Master, mockMasters } from './mockMasters';
 import { CreateMasterDto } from './dto/create-master.dto';
 
 @Injectable()
 export class MastersService {
-  findAll(profession?: string, city?: string) {
+  findAll(profession?: string, city?: string): Master[] {
     let result = mockMasters;
 
     if (profession) {
@@ -22,13 +22,13 @@ export class MastersService {
     return result;
   }
 
-  findOne(id: number) {
+  findOne(id: number): Master | undefined {
     return mockMasters.find((m) => m.id === id);
   }
 
-  createMaster(data: CreateMasterDto) {
-    const newMaster = {
-      id: Date.now(),
+  createMaster(data: CreateMasterDto): Master {
+    const newMaster: Master = {
+      id: Date.now(), // za demo purposes
       rating: 0,
       reviews: 0,
       available: true,
@@ -42,23 +42,20 @@ export class MastersService {
 
   updateMaster(
     id: number,
-    data: Partial<{
-      name: string;
-      profession: string;
-      city: string;
-      phone: string;
-      available: boolean;
-      image: string;
-    }>,
-  ) {
-    const masterIndex = mockMasters.findIndex((m) => m.id === id);
-    if (masterIndex === -1) return null;
+    data: Partial<Master>,
+    account: { id: number; role: 'user' | 'master'; masterId?: number },
+  ): Master {
+    const master = mockMasters.find((m) => m.id === id);
+    if (!master) {
+      throw new HttpException('Master not found', HttpStatus.NOT_FOUND);
+    }
 
-    mockMasters[masterIndex] = {
-      ...mockMasters[masterIndex],
-      ...data,
-    };
+    // 🔹 Provera da li je logovani master vlasnik profila
+    if (account.role !== 'master' || account.masterId !== id) {
+      throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
+    }
 
-    return mockMasters[masterIndex];
+    Object.assign(master, data);
+    return master;
   }
 }

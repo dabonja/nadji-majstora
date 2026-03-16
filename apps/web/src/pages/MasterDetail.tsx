@@ -21,16 +21,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { ArrowDownIcon, ArrowUpIcon, StarIcon } from "@chakra-ui/icons";
-import {
-  type Master,
-  mockMasterWorks,
-  type MasterWork,
-} from "../services/mockMasters";
-import { mockComments, type MasterComment } from "../services/mockComments";
 import { useEffect, useState } from "react";
-import type { Account } from "../services/mockAccounts";
-import { mastersApi } from "../services/mastersApi";
+
 import { commentsApi } from "../services/commentsApi";
+import type { Account } from "../types/account";
+import type { Master } from "../types/master";
+import type { MasterWork } from "../types/masterWork";
+import type { MasterComment } from "../types/comment";
+import { mastersApi } from "../services/mastersApi";
 
 interface Props {
   currentUser: Account;
@@ -39,25 +37,41 @@ interface Props {
 const MasterDetail = ({ currentUser }: Props) => {
   const { id } = useParams();
 
-  const [comments, setComments] = useState<MasterComment[]>(mockComments);
+  const [comments, setComments] = useState<MasterComment[]>([]);
   const [newComment, setNewComment] = useState("");
-  const [works, setWorks] = useState<MasterWork[]>(mockMasterWorks);
+   const [works, setWorks] = useState<MasterWork[]>([]);
   const [master, setMaster] = useState<Master | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+useEffect(() => {
+  if (!id) return;
 
-  useEffect(() => {
-    if (!id) return;
-
-    mastersApi.getMasterById(Number(id)).then((data) => {
+  const fetchMaster = async () => {
+    try {
+      const data: Master = await mastersApi.getMasterById(Number(id));
       setMaster(data);
-    });
-  }, [id]);
+    } catch (err) {
+      console.error("Greška pri učitavanju majstora:", err);
+    }
+  };
 
-  useEffect(() => {
-    if(!master) return;
-  commentsApi.getComments(master.id).then(setComments);
-}, [master?.id]);
+  fetchMaster();
+}, [id]);
+// useEffect(() => {
+//   if (!master) return;
+
+//   const fetchComments = async () => {
+//     try {
+//       const data: MasterComment[] = await commentsApi.getComments(master.id);
+//       setComments(data);
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   fetchComments();
+// }, [master?.id]);
+console.log('masterDetail', id)
 
   if (!master) return <Text>Majstor nije pronađen</Text>;
 

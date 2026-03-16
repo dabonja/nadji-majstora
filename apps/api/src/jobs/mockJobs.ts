@@ -1,0 +1,43 @@
+import { JobOffer } from './types/jobs.type';
+
+export const mockJobs: JobOffer[] = [
+  {
+    id: 1,
+    title: 'Popravka kuhinjskih elemenata',
+    description: 'Potrebno srediti kuhinjske ormariće i radnu ploču.',
+    budget: 5000,
+    profession: 'stolar',
+    deadline: '2026-03-25',
+    createdAt: '2026-03-14',
+    status: 'active',
+    applicants: [],
+    userId: 1,
+    contact: '064/123-4567',
+  },
+  {
+    id: 2,
+    title: 'Električarski radovi u stanu',
+    description: 'Postavljanje novih utičnica i provera elektro instalacija.',
+    budget: 8000,
+    profession: 'električar',
+    deadline: '2026-03-22',
+    createdAt: '2026-03-14',
+    status: 'active',
+    applicants: [1],
+    userId: 1,
+    contact: '064/987-6543',
+  },
+  {
+    id: 3,
+    title: 'Popravka kuhinjskih elemenata',
+    description: 'Potrebno srediti kuhinjske ormariće i radnu ploču.',
+    budget: 5000,
+    profession: 'stolar',
+    deadline: '2026-03-25',
+    createdAt: '2026-03-14',
+    status: 'active',
+    applicants: [1],
+    userId: 98,
+    contact: '064/987-6543',
+  },
+];

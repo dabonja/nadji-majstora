@@ -5,10 +5,13 @@ import {
   Param,
   Post,
   Body,
-  Patch,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { MastersService } from './masters.service';
 import { CreateMasterDto } from './dto/create-master.dto';
+import type { Master } from './mockMasters';
+import { Account } from 'src/accounts/types/account.type';
 
 @Controller('masters')
 export class MastersController {
@@ -32,8 +35,17 @@ export class MastersController {
     return this.mastersService.createMaster(data);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
-    return this.mastersService.updateMaster(Number(id), data);
+  @Post(':id/update')
+  updateMaster(
+    @Param('id') id: string,
+    @Body() body: { data: Partial<Master>; account: Account },
+  ): Master {
+    const { data, account } = body;
+
+    if (!account) {
+      throw new HttpException('Account is required', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.mastersService.updateMaster(Number(id), data, account);
   }
 }

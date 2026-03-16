@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 import { Box, Button, HStack, Text, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import type { Account } from "../services/mockAccounts";
+import type { Account } from "../types/account";
 
 interface Props {
   currentUser: Account;
@@ -42,7 +42,7 @@ const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
 
           {/* Dugme za ponude */}
           <HStack spacing={4}>
-            {currentUser.role === "user" && (
+            {currentUser.role === "user" ? (
               <Button
                 size="sm"
                 colorScheme="orange"
@@ -50,16 +50,16 @@ const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
               >
                 Moje ponude
               </Button>
-            )}
-            {currentUser.role === "master" && (
+            ) : (
               <Button
                 size="sm"
                 colorScheme="orange"
-                onClick={() => navigate("/jobs")}
+                onClick={() => navigate("/my-jobs")}
               >
                 Sve ponude
               </Button>
             )}
+
             {currentUser.role === "master" && (
               <Button
                 size="sm"
@@ -69,11 +69,11 @@ const Navbar = ({ currentUser, setCurrentUser, search, setSearch }: Props) => {
                 Registruj se
               </Button>
             )}
-                 {currentUser.role === "master" && (
+            {currentUser?.role === "master" && currentUser.masterId && (
               <Button
                 size="sm"
                 colorScheme="yellow"
-                onClick={() => navigate("/profile")}
+                onClick={() => navigate(`/profile/${currentUser.masterId}`)}
               >
                 Uredi profil
               </Button>

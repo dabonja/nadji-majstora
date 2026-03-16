@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Box, Button, ChakraProvider } from "@chakra-ui/react";
-import { useState, type SetStateAction } from "react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -10,18 +10,27 @@ import CreateJob from "./pages/CreateJob";
 import Login from "./pages/Login";
 import JobDetail from "./pages/JobDetail";
 
-import type { Account } from "./services/mockAccounts";
 import { mockJobs, type JobOffer } from "./services/mockJobs";
-import { mockMasters, type Master } from "./services/mockMasters";
+
 import RegisterMaster from "./pages/RegisterMaster";
 import MasterProfile from "./components/MasterProfile";
+import type { Account } from "./types/account";
+import type { Master } from "./types/master";
+import { mastersApi } from "./services/mastersApi";
+
+
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Account | null>(null);
   const [jobs, setJobs] = useState<JobOffer[]>(mockJobs);
-  const [masters, setMasters] = useState<Master[]>(mockMasters);
+  const [masters, setMasters] = useState<Master[]>([]);
   const [search, setSearch] = useState("");
 
+useEffect(() => {
+  mastersApi.getMasters()
+    .then(setMasters)
+    .catch((err) => console.error("Error fetching masters:", err));
+}, []);
   const updateJobStatus = (jobId: number, newStatus: JobOffer["status"]) => {
     setJobs((prev) =>
       prev.map((job) =>
@@ -29,16 +38,14 @@ function App() {
       ),
     );
   };
-
+console.log('currentUser', currentUser  )
   return (
     <ChakraProvider>
       <BrowserRouter>
-        {/* LOGIN */}
         {!currentUser ? (
           <Login setCurrentUser={setCurrentUser} />
         ) : (
           <>
-            {/* NAVBAR mora biti unutar BrowserRouter */}
             <Navbar
               currentUser={currentUser}
               setCurrentUser={setCurrentUser}
@@ -64,13 +71,13 @@ function App() {
                   element={<MasterDetail currentUser={currentUser} />}
                 />
 
+                {/* Rute samo za user role */}
                 {currentUser.role === "user" && (
                   <>
                     <Route
                       path="/create-job"
                       element={<CreateJob currentUser={currentUser} />}
                     />
-
                     <Route
                       path="/my-jobs"
                       element={
@@ -85,6 +92,7 @@ function App() {
                   </>
                 )}
 
+                {/* Rute samo za master role */}
                 {currentUser.role === "master" && (
                   <Route
                     path="/my-jobs"
@@ -99,6 +107,7 @@ function App() {
                   />
                 )}
 
+                {/* Job detail */}
                 <Route
                   path="/job/:id"
                   element={
@@ -109,15 +118,28 @@ function App() {
                     />
                   }
                 />
-                <Route path="/register-master" element={<RegisterMaster />} />
 
-                {currentUser?.role === "master" && (
+                {/* Registracija majstora */}
+                <Route
+                  path="/register-master"
+                  element={
+                    <RegisterMaster
+                    />
+                  }
+                />
+
+                {/* Profil za logovanog majstora */}
+                {currentUser.role === "master" && (
                   <Route
-                    path="/profile"
-                    element={<MasterProfile currentUser={currentUser} />}
+                    path="/profile/:id"
+                    element={
+                      <MasterProfile
+                      />
+                    }
                   />
                 )}
 
+                {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>

@@ -1,26 +1,33 @@
 import { useEffect, useState } from "react";
-
-import { Box, Text, Switch, HStack, Button, VStack, Image } from "@chakra-ui/react";
-import type { Master } from "../services/mockMasters";
+import { Box, Text, Switch, HStack, VStack, Image } from "@chakra-ui/react";
+import { useParams, useNavigate } from "react-router-dom";
 import { mastersApi } from "../services/mastersApi";
+import type { Master } from "../types/master";
 
-interface Props {
-  currentUser: { id: number; role: string; username: string };
-}
-
-const MasterProfile = ({ currentUser }: Props) => {
+const MasterProfile = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [master, setMaster] = useState<Master | null>(null);
   const [updating, setUpdating] = useState(false);
-
+console.log("MasterProfile mount, id:", id);
   useEffect(() => {
-    mastersApi.getMasterById(currentUser.id).then(setMaster);
-  }, [currentUser.id]);
+    if (!id) {
+      navigate("/");
+      return;
+    }
+
+    // Poziv backend-a po ID iz URL-a
+    mastersApi.getMasterById(Number(id))
+      .then(setMaster)
+      .catch(() => navigate("/")); // ako ID ne postoji
+  }, [id]);
 
   if (!master) return <Text>Učitavanje...</Text>;
 
   const toggleAvailable = async () => {
     setUpdating(true);
     try {
+      // PATCH mora backend da proveri da li logovani master može da menja
       const updated = await mastersApi.updateMaster(master.id, {
         available: !master.available,
       });
@@ -29,7 +36,7 @@ const MasterProfile = ({ currentUser }: Props) => {
       setUpdating(false);
     }
   };
-
+console.log("Master profile render", master);
   return (
     <Box p={6}>
       <VStack align="start" spacing={4}>
